@@ -1,0 +1,171 @@
+﻿<!DOCTYPE html>
+<html>
+	<title>Learning Maps API</title>
+	<link rel="icon" href="C:\Users\bane\Downloads\hex.png">
+  <head>
+    <style type="text/css">
+      html, body, #map-canvas { height: 100%; margin: 0%; padding: 1%; background-color: #ffffff; }
+    </style>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true">
+    </script>
+    <script type="text/javascript">
+     
+	 var directionsService = new google.maps.DirectionsService();
+	 
+function initialize() {
+		
+	   
+	
+	directionsDisplay = new google.maps.DirectionsRenderer();
+	
+	//map.setTilt(45);
+			  
+	var mapOptions = {
+        center: { lat: 37.6189, lng: -122.3750}, //sfo 37.6189° N, 122.3750° W
+        zoom: 10,
+		mapTypeId: google.maps.MapTypeId.ROADMAP, //show satellite map
+		streetViewControl: true //shows pegman true by default
+        };
+    var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+	//directionsDisplay.setMap(map);
+	  
+      
+      
+
+//-------------- Place a draggable marker on the map
+	 
+	var sfo = new google.maps.LatLng(37.412814, -122.054092);
+	var marker = new google.maps.Marker({
+    position: sfo,
+    map: map,
+    draggable:true,
+    title:"Hanger 1",
+	animation: google.maps.Animation.DROP
+    
+	});
+	google.maps.event.addListener(marker, 'click', toggleBounce);
+	
+		function toggleBounce() {
+
+			if (marker.getAnimation() != null) {
+				marker.setAnimation(null);
+				} 
+			else {
+				marker.setAnimation(google.maps.Animation.BOUNCE);
+				}
+			};
+	    
+	calcRoute(); 
+  }
+  
+  function calcRoute() {
+	var start = document.getElementById('start').value;
+	var end = document.getElementById('end').value;
+	//var start = "{lat: 18.5204, lng: 73.856744}";
+	//var start =  "danville, ca";
+	//var end = "santa cruz, ca";
+	console.log(start, end);
+   
+	var request = {
+		origin: start,
+	  	destination:end,
+		travelMode: google.maps.TravelMode.DRIVING,
+		//avoidHighways: true,
+		//avoidTolls: true,
+		//waypoints: [
+			// {
+				// location:"palo alto, ca",
+				//  stopover:false
+			//},{
+				// location:"mountain view, ca",
+				// stopover:true
+			//}],
+		provideRouteAlternatives : true
+		};
+		
+	directionsService.route(request, function(response, status) {
+	console.log(status, response.routes.length);
+	//var altR = response.routes.length;
+	//console.log(altR);
+		if (status == google.maps.DirectionsStatus.OK) {
+			var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);		 
+			for (i=0; i< response.routes.length; i++){ 
+				var directionsDisplay = new google.maps.DirectionsRenderer();
+					
+					   
+				directionsDisplay.setDirections(response);
+					 
+				directionsDisplay.setRouteIndex(i);
+				var length = response.routes[i].legs[0].distance.text;
+				var ran = i+1;
+				console.log("Route # "+ ran );
+				var route2 = response.routes[i].summary;
+				console.log(length, route2);
+				var mapOptions = {
+					center: { lat: 37.6189, lng: -122.3750}, //sfo 37.6189° N, 122.3750° W
+					zoom: 10,
+					mapTypeId: google.maps.MapTypeId.ROADMAP, //show satellite map
+					streetViewControl: true //shows pegman true by default
+					};
+				
+				directionsDisplay.setMap(map);
+			  
+			}
+		var trafficLayer = new google.maps.TrafficLayer();
+		trafficLayer.setMap(map);	
+		
+	  }});
+ }
+//----
+  
+//----  
+ //---- Load a GeoJSON from the same server as our demo.
+ //map.data.loadGeoJson('./test.json');
+	
+	google.maps.event.addDomListener(window, 'load', initialize);  
+   
+	</script>
+  </head>
+  
+  
+  
+  <body>
+  
+  <div id="panel">
+    <b>Start: </b>
+    <select id="start" onchange="calcRoute();">
+      <option value="chicago, il">Chicago</option>
+      <option value="st louis, mo">St Louis</option>
+      <option value="joplin, mo">Joplin, MO</option>
+      <option value="oklahoma city, ok">Oklahoma City</option>
+      <option value="amarillo, tx">Amarillo</option>
+      <option value="gallup, nm">Gallup, NM</option>
+      <option value="flagstaff, az">Flagstaff, AZ</option>
+      <option value="winona, az">Winona</option>
+      <option value="kingman, az">Kingman</option>
+      <option value="barstow, ca">Barstow</option>
+      <option value="san bernardino, ca">San Bernardino</option>
+      <option value="los angeles, ca">Los Angeles</option>
+    </select>
+    <b>End: </b>
+    <select id="end" onchange="calcRoute();">
+      <option value="chicago, il">Chicago</option>
+      <option value="st louis, mo">St Louis</option>
+      <option value="joplin, mo">Joplin, MO</option>
+      <option value="oklahoma city, ok">Oklahoma City</option>
+      <option value="amarillo, tx">Amarillo</option>
+      <option value="gallup, nm">Gallup, NM</option>
+      <option value="flagstaff, az">Flagstaff, AZ</option>
+      <option value="winona, az">Winona</option>
+      <option value="kingman, az">Kingman</option>
+      <option value="barstow, ca">Barstow</option>
+      <option value="san bernardino, ca">San Bernardino</option>
+      <option value="los angeles, ca">Los Angeles</option>
+	  
+    </select>
+    </div>
+<div id="map-canvas"></div>
+  </body>
+
+  </html>
